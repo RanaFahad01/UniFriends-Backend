@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+  security:
+    oauth2:
+      client:
+        registration:
+            google:
+                client-id: REPLACE_WITH_YOUR_GOOGLE_CLIENT_ID
+                client-secret: REPLACE_WITH_YOUR_GOOGLE_CLIENT_SECRET
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+  frontend-url: http://localhost:5173
+  profanity:
+    api-url: ${PROFANITY_API_URL}
+    api-key: ${PROFANITY_API_KEY}

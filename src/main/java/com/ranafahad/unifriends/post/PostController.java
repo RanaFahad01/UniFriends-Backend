@@ -22,8 +22,7 @@ public class PostController {
     public ResponseEntity<Page<PostResponse>> getPosts(
             @RequestParam LeagueType type,
             @RequestParam(defaultValue = "0") int page) {
-        Page<Post> posts = postService.findByType(type, PageRequest.of(page, 20));
-        return ResponseEntity.ok(posts.map(PostResponse::from));
+        return ResponseEntity.ok(postService.findByType(type, PageRequest.of(page, 20)));
     }
 
     @PostMapping

@@ -1,5 +1,6 @@
 package com.ranafahad.unifriends.report;
 
+import com.ranafahad.unifriends.report.dto.ReportResponse;
 import com.ranafahad.unifriends.user.User;
 import com.ranafahad.unifriends.user.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -50,23 +51,31 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
-    public Page<Report> findByStatus(ReportStatus status, Pageable pageable) {
-        return reportRepository.findByStatus(status, pageable);
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> findByStatus(ReportStatus status, Pageable pageable) {
+        return reportRepository.findByStatus(status, pageable)
+                .map(ReportResponse::from);
     }
 
-    public Report findById(Long id) {
+    @Transactional(readOnly = true)
+    public ReportResponse getReport(Long id) {
+        return ReportResponse.from(findReportEntity(id));
+    }
+
+    // Package-private — used internally by dismissReport
+    Report findReportEntity(Long id) {
         return reportRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Report not found"));
     }
 
     @Transactional
-    public Report dismissReport(Long reportId, String callerEmail) {
-        Report report = findById(reportId);
+    public ReportResponse dismissReport(Long reportId, String callerEmail) {
+        Report report = findReportEntity(reportId);
         User reviewer = userService.findByEmail(callerEmail);
 
         report.setStatus(ReportStatus.DISMISSED);
         report.setReviewedAt(LocalDateTime.now());
         report.setReviewedBy(reviewer);
-        return reportRepository.save(report);
+        return ReportResponse.from(reportRepository.save(report));
     }
 }

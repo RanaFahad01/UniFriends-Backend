@@ -26,8 +26,7 @@ public class LeagueChatController {
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,
             Principal principal) {
-        Page<ChatMessage> messages = chatService.getMessages(id, principal.getName(), PageRequest.of(page, 50));
-        return ResponseEntity.ok(messages.map(ChatMessageResponse::from));
+        return ResponseEntity.ok(chatService.getMessages(id, principal.getName(), PageRequest.of(page, 50)));
     }
 
     @PostMapping("/api/leagues/{id}/read")
@@ -41,7 +40,7 @@ public class LeagueChatController {
             @DestinationVariable Long leagueId,
             @Payload SendMessageRequest request,
             Principal principal) {
-        ChatMessage message = chatService.sendMessage(leagueId, principal.getName(), request.content());
-        messagingTemplate.convertAndSend("/topic/league/" + leagueId, ChatMessageResponse.from(message));
+        ChatMessageResponse message = chatService.sendMessage(leagueId, principal.getName(), request.content());
+        messagingTemplate.convertAndSend("/topic/league/" + leagueId, message);
     }
 }

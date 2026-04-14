@@ -1,6 +1,7 @@
 package com.ranafahad.unifriends.post;
 
 import com.ranafahad.unifriends.league.LeagueType;
+import com.ranafahad.unifriends.post.dto.PostResponse;
 import com.ranafahad.unifriends.profile.ProfileRepository;
 import com.ranafahad.unifriends.profile.ProfileType;
 import com.ranafahad.unifriends.user.User;
@@ -23,8 +24,10 @@ public class PostService {
     private final UserService userService;
     private final ProfileRepository profileRepository;
 
-    public Page<Post> findByType(LeagueType type, Pageable pageable) {
-        return postRepository.findByTypeOrderByCreatedAtDesc(type, pageable);
+    @Transactional(readOnly = true)
+    public Page<PostResponse> findByType(LeagueType type, Pageable pageable) {
+        return postRepository.findByTypeOrderByCreatedAtDesc(type, pageable)
+                .map(PostResponse::from);
     }
 
     @Transactional

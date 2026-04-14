@@ -1,5 +1,6 @@
 package com.ranafahad.unifriends.league;
 
+import com.ranafahad.unifriends.league.dto.LeagueResponse;
 import com.ranafahad.unifriends.notification.NotificationService;
 import com.ranafahad.unifriends.user.User;
 import com.ranafahad.unifriends.user.UserService;
@@ -20,24 +21,34 @@ public class LeagueService {
     private final UserService userService;
     private final NotificationService notificationService;
 
-    public List<League> findByType(LeagueType type) {
-        return leagueRepository.findByType(type);
-    }
-
-    public List<League> findLeaguesByUserEmail(String email) {
-        User user = userService.findByEmail(email);
-        return leagueMemberRepository.findByUserId(user.getId()).stream()
-                .map(LeagueMember::getLeague)
+    @Transactional(readOnly = true)
+    public List<LeagueResponse> findByType(LeagueType type) {
+        return leagueRepository.findByType(type).stream()
+                .map(LeagueResponse::from)
                 .toList();
     }
 
-    public League findById(Long id) {
+    @Transactional(readOnly = true)
+    public List<LeagueResponse> findLeaguesByUserEmail(String email) {
+        User user = userService.findByEmail(email);
+        return leagueMemberRepository.findByUserId(user.getId()).stream()
+                .map(m -> LeagueResponse.from(m.getLeague()))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public LeagueResponse findById(Long id) {
+        return LeagueResponse.from(findLeagueEntity(id));
+    }
+
+    // Package-private — used internally by joinLeague, removeMember, createLeague checks
+    League findLeagueEntity(Long id) {
         return leagueRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("League not found"));
     }
 
     @Transactional
-    public League createLeague(String callerEmail, String name, LeagueType type, String description, String mascot) {
+    public LeagueResponse createLeague(String callerEmail, String name, LeagueType type, String description, String mascot) {
         User user = userService.findByEmail(callerEmail);
 
         if (user.getBannedAt() != null) {
@@ -67,13 +78,15 @@ public class LeagueService {
         // Initialize unread count for creator
         notificationService.initializeUnreadCount(user.getId(), league.getId());
 
-        return league;
+        // Map inside the transaction — memberCount is 1 (just the creator)
+        return LeagueResponse.from(leagueRepository.findById(league.getId())
+                .orElseThrow(() -> new EntityNotFoundException("League not found")));
     }
 
     @Transactional
     public void joinLeague(Long leagueId, String callerEmail) {
         User user = userService.findByEmail(callerEmail);
-        League league = findById(leagueId);
+        League league = findLeagueEntity(leagueId);
 
         // Rule 1: not banned
         if (user.getBannedAt() != null) {

@@ -1,5 +1,6 @@
 package com.ranafahad.unifriends.chat;
 
+import com.ranafahad.unifriends.chat.dto.ChatMessageResponse;
 import com.ranafahad.unifriends.league.League;
 import com.ranafahad.unifriends.league.LeagueMemberRepository;
 import com.ranafahad.unifriends.notification.NotificationService;
@@ -21,18 +22,20 @@ public class ChatService {
     private final UserService userService;
     private final NotificationService notificationService;
 
-    public Page<ChatMessage> getMessages(Long leagueId, String callerEmail, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<ChatMessageResponse> getMessages(Long leagueId, String callerEmail, Pageable pageable) {
         User user = userService.findByEmail(callerEmail);
 
         // Only league members can read messages
         if (!leagueMemberRepository.existsByLeagueIdAndUserId(leagueId, user.getId())) {
             throw new AccessDeniedException("Only league members can read messages");
         }
-        return chatMessageRepository.findByLeagueIdOrderBySentAtDesc(leagueId, pageable);
+        return chatMessageRepository.findByLeagueIdOrderBySentAtDesc(leagueId, pageable)
+                .map(ChatMessageResponse::from);
     }
 
     @Transactional
-    public ChatMessage sendMessage(Long leagueId, String callerEmail, String content) {
+    public ChatMessageResponse sendMessage(Long leagueId, String callerEmail, String content) {
         User user = userService.findByEmail(callerEmail);
 
         if (user.getBannedAt() != null) {
@@ -52,7 +55,7 @@ public class ChatService {
         // Increment unread counts for other members
         notificationService.incrementUnreadCounts(leagueId, user.getId());
 
-        return message;
+        return ChatMessageResponse.from(message);
     }
 
     @Transactional

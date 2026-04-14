@@ -22,18 +22,17 @@ public class ReportController {
     public ResponseEntity<Page<ReportResponse>> getReports(
             @RequestParam(defaultValue = "PENDING") ReportStatus status,
             @RequestParam(defaultValue = "0") int page) {
-        Page<Report> reports = reportService.findByStatus(status, PageRequest.of(page, 20));
-        return ResponseEntity.ok(reports.map(ReportResponse::from));
+        return ResponseEntity.ok(reportService.findByStatus(status, PageRequest.of(page, 20)));
     }
 
     @GetMapping("/reports/{id}")
     public ResponseEntity<ReportResponse> getReport(@PathVariable Long id) {
-        return ResponseEntity.ok(ReportResponse.from(reportService.findById(id)));
+        return ResponseEntity.ok(reportService.getReport(id));
     }
 
     @PostMapping("/reports/{id}/dismiss")
     public ResponseEntity<ReportResponse> dismissReport(@PathVariable Long id, Principal principal) {
-        return ResponseEntity.ok(ReportResponse.from(reportService.dismissReport(id, principal.getName())));
+        return ResponseEntity.ok(reportService.dismissReport(id, principal.getName()));
     }
 
     @DeleteMapping("/posts/{id}")

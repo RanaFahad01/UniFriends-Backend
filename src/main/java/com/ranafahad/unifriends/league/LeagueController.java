@@ -18,27 +18,24 @@ public class LeagueController {
 
     @GetMapping
     public ResponseEntity<List<LeagueResponse>> getLeagues(@RequestParam LeagueType type) {
-        List<League> leagues = leagueService.findByType(type);
-        return ResponseEntity.ok(leagues.stream().map(LeagueResponse::from).toList());
+        return ResponseEntity.ok(leagueService.findByType(type));
     }
 
     @GetMapping("/me")
     public ResponseEntity<List<LeagueResponse>> getMyLeagues(Principal principal) {
-        List<League> leagues = leagueService.findLeaguesByUserEmail(principal.getName());
-        return ResponseEntity.ok(leagues.stream().map(LeagueResponse::from).toList());
+        return ResponseEntity.ok(leagueService.findLeaguesByUserEmail(principal.getName()));
     }
 
     @PostMapping
     public ResponseEntity<LeagueResponse> createLeague(
             @RequestBody CreateLeagueRequest request,
             Principal principal) {
-        League league = leagueService.createLeague(principal.getName(), request.name(), request.type(), request.description(), request.mascot());
-        return ResponseEntity.ok(LeagueResponse.from(league));
+        return ResponseEntity.ok(leagueService.createLeague(principal.getName(), request.name(), request.type(), request.description(), request.mascot()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LeagueResponse> getLeague(@PathVariable Long id) {
-        return ResponseEntity.ok(LeagueResponse.from(leagueService.findById(id)));
+        return ResponseEntity.ok(leagueService.findById(id));
     }
 
     @PostMapping("/{id}/join")

@@ -27,12 +27,17 @@ public class Post {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
+    @Column(nullable = false, length = 150)
+    private String title;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LeagueType type;
+
+    private String tags; // comma-separated, max 5 tags, e.g. "chess,python,math"
 
     @CreationTimestamp
     private LocalDateTime createdAt;

@@ -22,11 +22,17 @@ public class LeagueController {
         return ResponseEntity.ok(leagues.stream().map(LeagueResponse::from).toList());
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<List<LeagueResponse>> getMyLeagues(Principal principal) {
+        List<League> leagues = leagueService.findLeaguesByUserEmail(principal.getName());
+        return ResponseEntity.ok(leagues.stream().map(LeagueResponse::from).toList());
+    }
+
     @PostMapping
     public ResponseEntity<LeagueResponse> createLeague(
             @RequestBody CreateLeagueRequest request,
             Principal principal) {
-        League league = leagueService.createLeague(principal.getName(), request.name(), request.type(), request.description());
+        League league = leagueService.createLeague(principal.getName(), request.name(), request.type(), request.description(), request.mascot());
         return ResponseEntity.ok(LeagueResponse.from(league));
     }
 

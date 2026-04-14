@@ -24,13 +24,20 @@ public class LeagueService {
         return leagueRepository.findByType(type);
     }
 
+    public List<League> findLeaguesByUserEmail(String email) {
+        User user = userService.findByEmail(email);
+        return leagueMemberRepository.findByUserId(user.getId()).stream()
+                .map(LeagueMember::getLeague)
+                .toList();
+    }
+
     public League findById(Long id) {
         return leagueRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("League not found"));
     }
 
     @Transactional
-    public League createLeague(String callerEmail, String name, LeagueType type, String description) {
+    public League createLeague(String callerEmail, String name, LeagueType type, String description, String mascot) {
         User user = userService.findByEmail(callerEmail);
 
         if (user.getBannedAt() != null) {
@@ -44,6 +51,7 @@ public class LeagueService {
                 .name(name)
                 .type(type)
                 .description(description)
+                .mascot(mascot)
                 .build();
         league = leagueRepository.save(league);
 
@@ -110,7 +118,7 @@ public class LeagueService {
                 .anyMatch(m -> m.getLeague().getType() == type);
         if (alreadyInType) {
             throw new IllegalStateException(
-                    "You are already in a" + (type == LeagueType.ACADEMIC ? "n academic" : " homies") + " league");
+                    "You are already in a" + (type == LeagueType.ACADEMIC ? "n academic" : "n extracurriculars") + " league");
         }
     }
 }

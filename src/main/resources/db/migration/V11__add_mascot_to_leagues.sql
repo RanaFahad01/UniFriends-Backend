@@ -1,0 +1,1 @@
+ALTER TABLE leagues ADD COLUMN mascot VARCHAR(20);

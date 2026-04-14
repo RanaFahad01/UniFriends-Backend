@@ -32,6 +32,9 @@ public class League {
 
     private String description;
 
+    @Column(length = 20)
+    private String mascot;
+
     @OneToMany(mappedBy = "league", cascade = CascadeType.ALL)
     @Builder.Default
     private List<LeagueMember> members = new ArrayList<>();

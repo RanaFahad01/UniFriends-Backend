@@ -9,8 +9,10 @@ public record PostResponse(
         Long authorId,
         String authorUsername,
         String authorAvatarUrl,
+        String title,
         String content,
         String type,
+        String tags,           // comma-separated, e.g. "chess,python,math" — split on "," to render pills
         LocalDateTime createdAt
 ) {
     public static PostResponse from(Post post) {
@@ -19,8 +21,10 @@ public record PostResponse(
                 post.getAuthor().getId(),
                 post.getAuthor().getUsername(),
                 post.getAuthor().getAvatarUrl(),
+                post.getTitle(),
                 post.getContent(),
                 post.getType().name(),
+                post.getTags(),
                 post.getCreatedAt()
         );
     }

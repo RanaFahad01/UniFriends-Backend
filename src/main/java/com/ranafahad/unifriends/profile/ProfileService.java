@@ -26,6 +26,11 @@ public class ProfileService {
         return profileRepository.findByUserId(userId);
     }
 
+    public Profile findByUserIdAndType(Long userId, ProfileType type) {
+        return profileRepository.findByUserIdAndType(userId, type)
+                .orElseThrow(() -> new EntityNotFoundException("Profile of type " + type.name() + " not found for this user"));
+    }
+
     @Transactional
     public Profile updateProfile(Long profileId, String callerEmail, String bio, String tags, String hobbies) {
         Profile profile = findById(profileId);

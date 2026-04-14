@@ -31,39 +31,44 @@ public class OnboardingService {
         String username = request.username();
         validateUsername(username);
 
+        // Validate that both profile sections are provided
+        if (request.academic() == null) {
+            throw new IllegalStateException("An academic (Student) profile is required to complete onboarding");
+        }
+        if (request.personality() == null) {
+            throw new IllegalStateException("A personality profile is required to complete onboarding");
+        }
+
         // Set username on user
         user.setUsername(username);
         user.setNewUser(false);
         userRepository.save(user);
 
-        // Create profiles if present
-        if (request.academic() != null) {
-            Profile profile = Profile.builder()
-                    .user(user)
-                    .type(ProfileType.STUDENT)
-                    .bio(request.academic().bio())
-                    .tags(joinIfPresent(request.academic().tags()))
-                    .hobbies(joinIfPresent(request.academic().hobbies()))
-                    .build();
-            profileRepository.save(profile);
-        }
-        if (request.personality() != null) {
-            Profile profile = Profile.builder()
-                    .user(user)
-                    .type(ProfileType.PERSONALITY)
-                    .bio(request.personality().bio())
-                    .tags(joinIfPresent(request.personality().tags()))
-                    .hobbies(joinIfPresent(request.personality().hobbies()))
-                    .build();
-            profileRepository.save(profile);
-        }
+        // Create both profiles
+        Profile studentProfile = Profile.builder()
+                .user(user)
+                .type(ProfileType.STUDENT)
+                .bio(request.academic().bio())
+                .tags(joinIfPresent(request.academic().tags()))
+                .hobbies(joinIfPresent(request.academic().hobbies()))
+                .build();
+        profileRepository.save(studentProfile);
+
+        Profile personalityProfile = Profile.builder()
+                .user(user)
+                .type(ProfileType.PERSONALITY)
+                .bio(request.personality().bio())
+                .tags(joinIfPresent(request.personality().tags()))
+                .hobbies(joinIfPresent(request.personality().hobbies()))
+                .build();
+        profileRepository.save(personalityProfile);
 
         // Return fresh JWT with isNewUser = false
         return jwtService.generateToken(user);
     }
 
     public UsernameCheckResponse checkUsername(String username) {
-        boolean formatValid = username != null && username.matches("^[a-zA-Z0-9_]{3,20}$");
+        boolean formatValid = username != null && username.matches("^[a-zA-Z0-9_]{3,15}$");
         if (!formatValid) {
             return new UsernameCheckResponse(false, false);
         }
@@ -73,8 +78,8 @@ public class OnboardingService {
     }
 
     private void validateUsername(String username) {
-        if (username == null || !username.matches("^[a-zA-Z0-9_]{3,20}$")) {
-            throw new IllegalStateException("Username must be 3-20 alphanumeric characters or underscores");
+        if (username == null || !username.matches("^[a-zA-Z0-9_]{3,15}$")) {
+            throw new IllegalStateException("Username must be 3-15 alphanumeric characters or underscores");
         }
         if (profanityCheckService.isFlagged(username)) {
             throw new IllegalStateException("Username contains inappropriate content");

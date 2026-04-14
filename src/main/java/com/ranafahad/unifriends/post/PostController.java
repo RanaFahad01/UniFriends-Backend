@@ -30,7 +30,7 @@ public class PostController {
     public ResponseEntity<PostResponse> createPost(
             @RequestBody CreatePostRequest request,
             Principal principal) {
-        Post post = postService.createPost(principal.getName(), request.content(), request.type());
+        Post post = postService.createPost(principal.getName(), request.title(), request.content(), request.type(), request.tags());
         return ResponseEntity.ok(PostResponse.from(post));
     }
 

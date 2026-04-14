@@ -9,6 +9,7 @@ public record LeagueResponse(
         String name,
         String type,
         String description,
+        String mascot,
         int memberCount,
         LocalDateTime createdAt
 ) {
@@ -18,6 +19,7 @@ public record LeagueResponse(
                 league.getName(),
                 league.getType().name(),
                 league.getDescription(),
+                league.getMascot(),
                 league.getMembers().size(),
                 league.getCreatedAt()
         );

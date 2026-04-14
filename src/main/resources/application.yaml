@@ -1,20 +1,29 @@
 spring:
   application:
     name: unifriends
+  main:
+    lazy-initialization: true   # only instantiate beans when first used — big startup memory win
+    banner-mode: off
+  jmx:
+    enabled: false              # we don't use JMX monitoring; saves ~10MB
   datasource:
     url: ${JDBC_DATABASE_URL}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 3      # default 10 — each connection holds memory on both app and DB side
+      maximum-pool-size: 2      # down from 3 — 2 is enough for single-dyno low traffic
       minimum-idle: 1
   jpa:
     hibernate:
       ddl-auto: validate
-    open-in-view: false         # default true — silences the warning and frees connections sooner
+    open-in-view: false
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        # Shrink Hibernate's internal caches (defaults are 2048 / 128)
+        query.plan_cache_max_size: 64
+        query.plan_parameter_metadata_max_size: 16
+        # Disable reflection optimizer bytecode generation
+        bytecode.use_reflection_optimizer: false
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -38,8 +47,10 @@ spring:
 server:
   tomcat:
     threads:
-      max: 20         # default 200, each thread costs ~512k stack; 20 is plenty for low traffic
-      min-spare: 4    # default 10
+      max: 10         # down from 20 — 10 handles plenty of concurrent requests for a small app
+      min-spare: 2
+    max-connections: 100    # default 8192 — cap total connections Tomcat will hold
+    accept-count: 10        # default 100 — cap the queue
 
 app:
   jwt:

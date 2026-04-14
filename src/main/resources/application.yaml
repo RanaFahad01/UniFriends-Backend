@@ -2,7 +2,7 @@ spring:
   application:
     name: unifriends
   datasource:
-    url: ${DATABASE_URL}
+    url: ${JDBC_DATABASE_URL}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

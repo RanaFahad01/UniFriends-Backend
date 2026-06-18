@@ -1,6 +1,9 @@
 spring:
   datasource:
-    url: ${DATABASE_URL}
+    url: jdbc:postgresql://localhost:5432/unifriends
+    username: postgres
+    password: your_db_password
+
   security:
     oauth2:
       client:
@@ -11,8 +14,11 @@ spring:
 
 app:
   jwt:
-    secret: ${JWT_SECRET}
+    secret: REPLACE_WITH_BASE64_SECRET
   frontend-url: http://localhost:5173
   profanity:
-    api-url: ${PROFANITY_API_URL}
-    api-key: ${PROFANITY_API_KEY}
+    api-key: REPLACE_WITH_PROFANITY_API_KEY
+  cors:
+    allowed-origins: http://localhost:5173
+  cookie:
+    secure: false

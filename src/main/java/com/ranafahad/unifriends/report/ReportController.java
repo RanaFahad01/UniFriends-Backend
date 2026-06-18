@@ -36,8 +36,8 @@ public class ReportController {
     }
 
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id, Principal principal) {
-        postService.deletePost(id, principal.getName());
+    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+        postService.deletePostByModerator(id);
         return ResponseEntity.ok().build();
     }
 }

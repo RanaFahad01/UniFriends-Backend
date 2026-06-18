@@ -103,4 +103,11 @@ public class PostService {
         }
         postRepository.delete(post);
     }
+
+    @Transactional
+    public void deletePostByModerator(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+        postRepository.delete(post);
+    }
 }

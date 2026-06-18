@@ -58,6 +58,7 @@ public class ChatService {
         return ChatMessageResponse.from(message);
     }
 
+
     @Transactional
     public void markRead(Long leagueId, String callerEmail) {
         User user = userService.findByEmail(callerEmail);

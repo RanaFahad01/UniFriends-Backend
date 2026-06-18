@@ -7,10 +7,12 @@ spring:
   jmx:
     enabled: false              # we don't use JMX monitoring; saves ~10MB
   datasource:
-    url: ${JDBC_DATABASE_URL}
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=require
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 2      # down from 3 — 2 is enough for single-dyno low traffic
+      maximum-pool-size: 2
       minimum-idle: 1
   jpa:
     hibernate:
@@ -45,6 +47,7 @@ spring:
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
 
 server:
+  port: ${PORT:8080}
   tomcat:
     threads:
       max: 10         # down from 20 — 10 handles plenty of concurrent requests for a small app

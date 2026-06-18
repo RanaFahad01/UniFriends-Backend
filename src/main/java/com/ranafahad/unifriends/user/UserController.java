@@ -51,4 +51,10 @@ public class UserController {
         reportService.createReport(principal.getName(), id, request.reason());
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteMe(Principal principal) {
+        userService.deleteCurrentUser(principal.getName());
+        return ResponseEntity.ok().build();
+    }
 }

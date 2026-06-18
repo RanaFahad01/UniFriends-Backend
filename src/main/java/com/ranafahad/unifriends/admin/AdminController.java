@@ -40,4 +40,16 @@ public class AdminController {
         adminService.removeModerator(id, principal.getName());
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/users/{id}/make-admin")
+    public ResponseEntity<Void> makeAdmin(@PathVariable Long id, Principal principal) {
+        adminService.makeAdmin(id, principal.getName());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/users/{id}/make-admin")
+    public ResponseEntity<Void> removeAdmin(@PathVariable Long id, Principal principal) {
+        adminService.removeAdmin(id, principal.getName());
+        return ResponseEntity.ok().build();
+    }
 }

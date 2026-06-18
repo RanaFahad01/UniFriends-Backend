@@ -57,7 +57,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String token = jwtService.generateToken(user);
 
-        // httpOnly cookie — carries the real JWT, JS cannot read it
+        // httpOnly cookie: carries the real JWT, JS cannot read it
         ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
                 .secure(secureCookie)
@@ -66,7 +66,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .maxAge(Duration.ofDays(1))
                 .build();
 
-        // JS-readable presence flag — no sensitive data, just signals a session exists
+        // JS-readable presence flag: no sensitive data, just signals a session exists
         ResponseCookie presenceCookie = ResponseCookie.from("jwt_present", "true")
                 .httpOnly(false)
                 .secure(secureCookie)

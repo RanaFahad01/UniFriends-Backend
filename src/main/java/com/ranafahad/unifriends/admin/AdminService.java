@@ -60,4 +60,25 @@ public class AdminService {
         target.setRole(Role.USER);
         userRepository.save(target);
     }
+
+    @Transactional
+    public void makeAdmin(Long userId, String callerEmail) {
+        User target = userService.findById(userId);
+        target.setRole(Role.ADMIN);
+        userRepository.save(target);
+    }
+
+    @Transactional
+    public void removeAdmin(Long userId, String callerEmail) {
+        User caller = userService.findByEmail(callerEmail);
+        if (caller.getId().equals(userId)) {
+            throw new IllegalStateException("You cannot demote yourself");
+        }
+        User target = userService.findById(userId);
+        if (target.getRole() != Role.ADMIN) {
+            throw new IllegalStateException("User is not an admin");
+        }
+        target.setRole(Role.USER);
+        userRepository.save(target);
+    }
 }

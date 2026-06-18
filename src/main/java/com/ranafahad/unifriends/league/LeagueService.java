@@ -110,6 +110,14 @@ public class LeagueService {
     }
 
     @Transactional
+    public void leaveLeague(Long leagueId, String callerEmail) {
+        User user = userService.findByEmail(callerEmail);
+        LeagueMember member = leagueMemberRepository.findByLeagueIdAndUserId(leagueId, user.getId())
+                .orElseThrow(() -> new IllegalStateException("You are not a member of this league"));
+        leagueMemberRepository.delete(member);
+    }
+
+    @Transactional
     public void removeMember(Long leagueId, Long userId, String callerEmail) {
         User caller = userService.findByEmail(callerEmail);
         LeagueMember callerMember = leagueMemberRepository.findByLeagueIdAndUserId(leagueId, caller.getId())

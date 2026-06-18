@@ -44,6 +44,12 @@ public class LeagueController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{id}/leave")
+    public ResponseEntity<Void> leaveLeague(@PathVariable Long id, Principal principal) {
+        leagueService.leaveLeague(id, principal.getName());
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{id}/members/{userId}")
     public ResponseEntity<Void> removeMember(
             @PathVariable Long id,

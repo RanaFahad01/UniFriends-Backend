@@ -3,6 +3,7 @@ package com.ranafahad.unifriends.user;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,5 +19,11 @@ public class UserService {
     public User findById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
+
+    @Transactional
+    public void deleteCurrentUser(String email) {
+        User user = findByEmail(email);
+        userRepository.delete(user);
     }
 }

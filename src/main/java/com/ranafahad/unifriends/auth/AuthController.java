@@ -25,11 +25,6 @@ public class AuthController {
     @Value("${app.cookie.secure:true}")
     private boolean secureCookie;
 
-    /**
-     * Issues a short-lived, one-time WebSocket ticket for the authenticated user.
-     * The frontend calls this just before opening a STOMP connection and passes
-     * the returned ticket as the Authorization header in the STOMP CONNECT frame.
-     */
     @GetMapping("/ws-ticket")
     public ResponseEntity<Map<String, String>> wsTicket(Principal principal) {
         String ticket = UUID.randomUUID().toString();
@@ -37,9 +32,6 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("ticket", ticket));
     }
 
-    /**
-     * Clears both auth cookies, effectively logging the user out.
-     */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         ResponseCookie clearJwt = ResponseCookie.from("jwt", "")

@@ -57,13 +57,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     private String extractToken(HttpServletRequest request) {
-        // 1. Authorization header — used by the ws-ticket endpoint and any direct API calls
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             return header.substring(7);
         }
 
-        // 2. httpOnly cookie — used by all browser REST requests
         if (request.getCookies() != null) {
             return Arrays.stream(request.getCookies())
                     .filter(c -> "jwt".equals(c.getName()))

@@ -41,7 +41,6 @@ public class LeagueService {
         return LeagueResponse.from(findLeagueEntity(id));
     }
 
-    // Package-private — used internally by joinLeague, removeMember, createLeague checks
     League findLeagueEntity(Long id) {
         return leagueRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("League not found"));
@@ -55,7 +54,6 @@ public class LeagueService {
             throw new IllegalStateException("Banned users cannot create leagues");
         }
 
-        // Check user isn't already in a league of this type
         checkNotInLeagueOfType(user, type);
 
         League league = League.builder()
@@ -66,7 +64,6 @@ public class LeagueService {
                 .build();
         league = leagueRepository.save(league);
 
-        // Creator becomes SENIOR or BIG_HOMIE
         LeagueMemberRole role = type == LeagueType.ACADEMIC ? LeagueMemberRole.SENIOR : LeagueMemberRole.BIG_HOMIE;
         LeagueMember member = LeagueMember.builder()
                 .league(league)
@@ -75,10 +72,8 @@ public class LeagueService {
                 .build();
         leagueMemberRepository.save(member);
 
-        // Initialize unread count for creator
         notificationService.initializeUnreadCount(user.getId(), league.getId());
 
-        // Map inside the transaction — memberCount is 1 (just the creator)
         return LeagueResponse.from(leagueRepository.findById(league.getId())
                 .orElseThrow(() -> new EntityNotFoundException("League not found")));
     }
@@ -88,13 +83,10 @@ public class LeagueService {
         User user = userService.findByEmail(callerEmail);
         League league = findLeagueEntity(leagueId);
 
-        // Rule 1: not banned
         if (user.getBannedAt() != null) {
             throw new IllegalStateException("Banned users cannot join leagues");
         }
-        // Rule 2: not already in a league of this type
         checkNotInLeagueOfType(user, league.getType());
-        // Rule 3: league under 30 members
         if (leagueMemberRepository.countByLeagueId(leagueId) >= 30) {
             throw new IllegalStateException("This league is full (max 30 members)");
         }
@@ -123,7 +115,6 @@ public class LeagueService {
         LeagueMember callerMember = leagueMemberRepository.findByLeagueIdAndUserId(leagueId, caller.getId())
                 .orElseThrow(() -> new AccessDeniedException("You are not a member of this league"));
 
-        // Only SENIOR or BIG_HOMIE can remove members
         if (callerMember.getMemberRole() == LeagueMemberRole.MEMBER) {
             throw new AccessDeniedException("Only league leaders can remove members");
         }

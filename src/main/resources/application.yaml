@@ -48,6 +48,7 @@ spring:
 
 server:
   port: ${PORT:8080}
+  forward-headers-strategy: native
   tomcat:
     threads:
       max: 10         # down from 20 — 10 handles plenty of concurrent requests for a small app

@@ -25,6 +25,9 @@ public class AuthController {
     @Value("${app.cookie.secure:true}")
     private boolean secureCookie;
 
+    @Value("${app.cookie.domain:}")
+    private String cookieDomain;
+
     @GetMapping("/ws-ticket")
     public ResponseEntity<Map<String, String>> wsTicket(Principal principal) {
         String ticket = UUID.randomUUID().toString();
@@ -34,12 +37,15 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
+        String domain = cookieDomain.isBlank() ? null : cookieDomain;
+
         ResponseCookie clearJwt = ResponseCookie.from("jwt", "")
                 .httpOnly(true)
                 .secure(secureCookie)
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(0)
+                .domain(domain)
                 .build();
 
         ResponseCookie clearPresence = ResponseCookie.from("jwt_present", "")
@@ -48,6 +54,7 @@ public class AuthController {
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(0)
+                .domain(domain)
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, clearJwt.toString());

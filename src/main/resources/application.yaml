@@ -68,3 +68,4 @@ app:
     allowed-origins: ${FRONTEND_URL}
   cookie:
     secure: true  # set to false in application-local.yml for localhost (no HTTPS)
+    domain: ${COOKIE_DOMAIN:}

@@ -31,6 +31,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Value("${app.cookie.secure:true}")
     private boolean secureCookie;
 
+    @Value("${app.cookie.domain:}")
+    private String cookieDomain;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
@@ -57,6 +60,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String token = jwtService.generateToken(user);
 
+        String domain = cookieDomain.isBlank() ? null : cookieDomain;
+
         // httpOnly cookie: carries the real JWT, JS cannot read it
         ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
@@ -64,6 +69,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(Duration.ofDays(1))
+                .domain(domain)
                 .build();
 
         // JS-readable presence flag: no sensitive data, just signals a session exists
@@ -73,6 +79,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(Duration.ofDays(1))
+                .domain(domain)
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
